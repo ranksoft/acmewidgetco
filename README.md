@@ -2,7 +2,10 @@
 
 Welcome to the Shopping Basket Command Line Interface (CLI). This application allows users to interact with a shopping basket, add products, calculate totals with potential discounts, and apply delivery charges accordingly.
 
-#### Config Path:
+## Requirements for test task:
+* You can find the requirements for the test task in the file: `./requirements.pdf`
+
+## Config Path:
 * directory: `./config`
 * file: `./config/config.php`
 * DI: `./config/services.php`
@@ -10,7 +13,7 @@ Welcome to the Shopping Basket Command Line Interface (CLI). This application al
 * Special offers: `./config/offers.php`
 * Total collectors: `./config/totals.php`
 
-### Installation
+## Installation
 To install the application, please follow the steps below:
 1. `git clone https://github.com/repo/acme-widget-co-basket.git`
 2. `cd acme-widget-co-basket`
