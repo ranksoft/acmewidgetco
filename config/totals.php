@@ -14,12 +14,6 @@ return [
         ],
         'priority' => 1,
     ],
-    $config->get(['total_types', 'discount']) => [
-        'collectors' => [
-            DiscountCollector::class,
-        ],
-        'priority' => 2,
-    ],
     $config->get(['total_types', 'delivery']) => [
         'collectors' => [
             DeliveryCollector::class,

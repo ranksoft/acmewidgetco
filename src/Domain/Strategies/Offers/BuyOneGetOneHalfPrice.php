@@ -12,6 +12,11 @@ class BuyOneGetOneHalfPrice implements OfferInterface, ExtensionInterface
     /**
      * @var string
      */
+    const DISCOUNT_TYPE = 'buy_one_get_one_half_price';
+
+    /**
+     * @var string
+     */
     const EXTENSION_DATA_PRODUCT_CODE_KEY = 'product_code';
 
     /**
@@ -32,7 +37,10 @@ class BuyOneGetOneHalfPrice implements OfferInterface, ExtensionInterface
                 if ($discountQuantity > 0) {
                     $halfPrice = $item->getProduct()->getPrice()->dividedBy(2);
                     $totalDiscount = $halfPrice->multipliedBy($discountQuantity);
-                    $item->setDiscount($totalDiscount);
+                    $item->getDiscount()->setDiscount(
+                        self::DISCOUNT_TYPE,
+                        $totalDiscount
+                    );
                 }
             }
         }

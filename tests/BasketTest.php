@@ -6,7 +6,9 @@ namespace AcmeWidgetCo\Tests;
 use AcmeWidgetCo\Domain\Entities\Basket;
 use AcmeWidgetCo\Domain\Entities\Product;
 use AcmeWidgetCo\Domain\Factories\BasketItemFactory;
+use AcmeWidgetCo\Domain\Factories\DiscountFactory;
 use AcmeWidgetCo\Domain\Factories\TotalFactory;
+use AcmeWidgetCo\Domain\Interfaces\DiscountFactoryInterface;
 use AcmeWidgetCo\Domain\Interfaces\ProductInterface;
 use AcmeWidgetCo\Domain\Interfaces\ProductRepositoryInterface;
 use AcmeWidgetCo\Domain\Services\TotalCollectorManager;
@@ -70,9 +72,9 @@ class BasketTest extends TestCase
                 'G01' => $this->productG01,
                 'R01' => $this->productR01,
             ]);
-        $this->basketItemFactory = new BasketItemFactory();
+        $this->basketItemFactory = new BasketItemFactory(new DiscountFactory());
         $this->totalFactory = new TotalFactory();
-        $totalTypes = ['subtotal', 'discount', 'delivery'];
+        $totalTypes = ['subtotal', 'delivery'];
         $this->totalCollectorManager = new TotalCollectorManager(
             new ConfigTotalRepository(new DIContainer()),
             $totalTypes
@@ -117,7 +119,7 @@ class BasketTest extends TestCase
         $this->basket->add('R01');
         $this->basket->add('R01');
         $this->assertEquals(
-            Money::of(54.375, 'USD', new CustomContext(ProductInterface::PRICE_SCALE)),
+            Money::of(54.37, 'USD', new CustomContext(ProductInterface::PRICE_SCALE)),
             $this->basket->getTotal()->getGrandTotal()
         );
 
@@ -138,7 +140,7 @@ class BasketTest extends TestCase
         $this->basket->add('R01');
         $this->basket->add('R01');
         $this->assertEquals(
-            Money::of(98.275, 'USD', new CustomContext(ProductInterface::PRICE_SCALE)),
+            Money::of(98.27, 'USD', new CustomContext(ProductInterface::PRICE_SCALE)),
             $this->basket->getTotal()->getGrandTotal()
         );
     }

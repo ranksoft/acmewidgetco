@@ -14,13 +14,13 @@ class Formatter implements FormatterInterface
      * @inheritdoc
      * @throws RoundingNecessaryException
      */
-    public function format(Money $money): string
+    public function format(Money $money, RoundingMode $roundingMode = RoundingMode::UNNECESSARY): string
     {
         $fractionalPart = $money->getAmount()->getFractionalPart();
         if (!(int)$fractionalPart) {
             return $money->getAmount()->getIntegralPart();
         }
 
-        return (string)$money->getAmount()->toScale(2, RoundingMode::UP);
+        return (string)$money->getAmount()->toScale(2, $roundingMode);
     }
 }

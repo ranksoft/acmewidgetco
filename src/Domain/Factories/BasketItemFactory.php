@@ -6,15 +6,18 @@ namespace AcmeWidgetCo\Domain\Factories;
 use AcmeWidgetCo\Domain\Entities\BasketItem;
 use AcmeWidgetCo\Domain\Interfaces\BasketItemFactoryInterface;
 use AcmeWidgetCo\Domain\Interfaces\BasketItemInterface;
+use AcmeWidgetCo\Domain\Interfaces\DiscountFactoryInterface;
 use AcmeWidgetCo\Domain\Interfaces\ProductInterface;
 use AcmeWidgetCo\Infrastructure\Config\Config;
-use Brick\Math\Exception\MathException;
 
 class BasketItemFactory implements BasketItemFactoryInterface
 {
+    public function __construct(private readonly DiscountFactoryInterface $discountFactory)
+    {
+    }
+
     /**
      * @inheritdoc
-     * @throws MathException
      */
     public function create(
         ProductInterface $product,
@@ -22,6 +25,6 @@ class BasketItemFactory implements BasketItemFactoryInterface
         string           $currency = Config::DEFAULT_CURRENCY
     ): BasketItemInterface
     {
-        return new BasketItem($product, $quantity, $currency);
+        return new BasketItem($product, $this->discountFactory->create($currency), $quantity, $currency);
     }
 }

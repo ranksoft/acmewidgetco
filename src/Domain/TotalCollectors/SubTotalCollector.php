@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace AcmeWidgetCo\Domain\TotalCollectors;
 
 use AcmeWidgetCo\Domain\Interfaces\BasketInterface;
+use AcmeWidgetCo\Domain\Interfaces\OfferManagerInterface;
 use AcmeWidgetCo\Domain\Interfaces\ProductInterface;
 use AcmeWidgetCo\Domain\Interfaces\TotalCollectorInterface;
 use AcmeWidgetCo\Domain\Interfaces\TotalInterface;
@@ -21,10 +22,12 @@ class SubTotalCollector implements TotalCollectorInterface
     private int $priority = 0;
 
     /**
+     * @param OfferManagerInterface $offerManager
      * @param string $totalType
      * @param string $currency
      */
     public function __construct(
+        private readonly OfferManagerInterface $offerManager,
         private readonly string $totalType,
         private readonly string $currency = Config::DEFAULT_CURRENCY,
     )
@@ -38,9 +41,10 @@ class SubTotalCollector implements TotalCollectorInterface
      */
     public function collect(BasketInterface $basket): void
     {
+        $this->offerManager->applyOffers($basket);
         $subTotal = $basket->getTotal()->getTotal($this->getType());
         foreach ($basket->getItems() as $item) {
-            $subTotal = $subTotal->plus($item->getPrice());
+            $subTotal = $subTotal->plus($item->getPriceWithDiscount());
         }
         $basket->getTotal()->setTotal($this->getType(), $subTotal);
         $this->updateGrandTotal($basket->getTotal());

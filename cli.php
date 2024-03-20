@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use AcmeWidgetCo\Domain\Interfaces\BasketInterface;
 use AcmeWidgetCo\Domain\Interfaces\FormatterInterface;
+use AcmeWidgetCo\Infrastructure\Config\Config;
 use AcmeWidgetCo\Infrastructure\DI\DIContainer;
 
 require_once 'vendor/autoload.php';
@@ -10,6 +11,7 @@ require_once 'vendor/autoload.php';
 $di = new DIContainer();
 $priceFormatter = $di->get(FormatterInterface::class);
 $basket = $di->get(BasketInterface::class);
+$config = $di->get(Config::class);
 
 while (true) {
     echo "---------------------------\n";
@@ -29,8 +31,11 @@ while (true) {
             echo "\033[0;32mThe product has been added to your cart.\033[0m\n";
             break;
         case "2":
+            $subtotal = $basket->getTotal()->getTotal($config->get(['total_types', 'subtotal']));
+            $delivery = $basket->getTotal()->getTotal($config->get(['total_types', 'delivery']));
             $total = $basket->getTotal()->getGrandTotal();
-            echo "Total cart without formatter: \033[0;32m", $total->getAmount(), "\033[0m ", $total->getCurrency(), "\n";
+            echo "Subtotal: \033[0;33m", $priceFormatter->format($subtotal), "\033[0m ", $total->getCurrency(), "\n";
+            echo "Delivery: \033[0;33m", $priceFormatter->format($delivery), "\033[0m ", $total->getCurrency(), "\n";
             echo "Total cart: \033[0;32m", $priceFormatter->format($total), "\033[0m ", $total->getCurrency(), "\n";
             break;
         case "3":
@@ -42,7 +47,7 @@ while (true) {
                     echo "Product: ", $item->getProduct()->getName(),
                     ", Code: \033[0;34m", $item->getProduct()->getCode(), "\033[0m",
                     ", Quantity: ", $item->getQuantity(),
-                    ", Price: \033[0;32m", $priceFormatter->format($item->getPrice()), "\033[0m ", $item->getPrice()->getCurrency(),
+                    ", Price: \033[0;33m", $priceFormatter->format($item->getPrice()), "\033[0m ", $item->getPrice()->getCurrency(),
                     ", Price with discount: \033[0;32m", $priceFormatter->format($item->getPriceWithDiscount()), "\033[0m ", $item->getPriceWithDiscount()->getCurrency(), "\n";
                 }
             }

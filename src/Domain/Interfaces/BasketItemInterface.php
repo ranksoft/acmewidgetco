@@ -24,15 +24,15 @@ interface BasketItemInterface
     public function setQuantity(int $quantity): void;
 
     /**
-     * @param Money $discount
+     * @param DiscountInterface $discount
      * @return void
      */
-    public function setDiscount(Money $discount): void;
+    public function setDiscount(DiscountInterface $discount): void;
 
     /**
-     * @return Money
+     * @return DiscountInterface
      */
-    public function getDiscount(): Money;
+    public function getDiscount(): DiscountInterface;
 
     /**
      * @return Money

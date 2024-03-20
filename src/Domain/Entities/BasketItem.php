@@ -4,11 +4,14 @@ declare(strict_types=1);
 namespace AcmeWidgetCo\Domain\Entities;
 
 use AcmeWidgetCo\Domain\Interfaces\BasketItemInterface;
+use AcmeWidgetCo\Domain\Interfaces\DiscountInterface;
 use AcmeWidgetCo\Domain\Interfaces\ProductInterface;
 use AcmeWidgetCo\Infrastructure\Config\Config;
 use Brick\Math\Exception\MathException;
+use Brick\Math\RoundingMode;
 use Brick\Money\Context\CustomContext;
 use Brick\Money\Exception\MoneyMismatchException;
+use Brick\Money\Exception\UnknownCurrencyException;
 use Brick\Money\Money;
 
 class BasketItem implements BasketItemInterface
@@ -19,24 +22,19 @@ class BasketItem implements BasketItemInterface
     private Money $price;
 
     /**
-     * @var Money
-     */
-    private Money $discount;
-
-    /**
      * @param ProductInterface $product
+     * @param DiscountInterface $discount
      * @param int $quantity
      * @param string $currency
-     * @throws MathException
      */
     public function __construct(
-        private     readonly ProductInterface $product,
-        private int $quantity = 1,
-        private     readonly string $currency = Config::DEFAULT_CURRENCY
+        private                   readonly ProductInterface $product,
+        private DiscountInterface $discount,
+        private int               $quantity = 1,
+        private                   readonly string $currency = Config::DEFAULT_CURRENCY
     )
     {
         $this->setPrice(Money::zero($this->currency, new CustomContext(ProductInterface::PRICE_SCALE)));
-        $this->setDiscount(Money::zero($this->currency, new CustomContext(ProductInterface::PRICE_SCALE)));
     }
 
     /**
@@ -67,18 +65,16 @@ class BasketItem implements BasketItemInterface
 
     /**
      * @inheritdoc
-     * @throws MathException
      */
-    public function setDiscount(Money $discount): void
+    public function setDiscount(DiscountInterface $discount): void
     {
         $this->discount = $discount;
-        $this->recalculatePrice();
     }
 
     /**
      * @inheritdoc
      */
-    public function getDiscount(): Money
+    public function getDiscount(): DiscountInterface
     {
         return $this->discount;
     }
@@ -94,15 +90,21 @@ class BasketItem implements BasketItemInterface
     /**
      * @inheritdoc
      * @throws MathException
-     * @throws MoneyMismatchException
+     * @throws MoneyMismatchException|UnknownCurrencyException
      */
     public function getPriceWithDiscount(): Money
     {
+        $this->recalculatePrice();
         $price = $this->price;
-        if (!$this->discount->isZero()) {
-            $price = $price->minus($this->discount);
+        if (!$this->discount->getTotalDiscount()->isZero()) {
+            $price = $price->minus($this->discount->getTotalDiscount());
         }
-        return $price;
+        return Money::of(
+            $price->getAmount()->toScale(2, RoundingMode::DOWN),
+            $price->getCurrency(),
+            new CustomContext(ProductInterface::PRICE_SCALE),
+            RoundingMode::UP
+        );
     }
 
 

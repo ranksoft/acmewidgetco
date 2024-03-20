@@ -5,10 +5,12 @@ use AcmeWidgetCo\Application\Services\Formatter;
 use AcmeWidgetCo\Domain\Entities\Basket;
 use AcmeWidgetCo\Domain\Entities\BasketItem;
 use AcmeWidgetCo\Domain\Entities\DeliveryCondition;
+use AcmeWidgetCo\Domain\Entities\Discount;
 use AcmeWidgetCo\Domain\Entities\Product;
 use AcmeWidgetCo\Domain\Entities\Total;
 use AcmeWidgetCo\Domain\Factories\BasketItemFactory;
 use AcmeWidgetCo\Domain\Factories\DeliveryConditionFactory;
+use AcmeWidgetCo\Domain\Factories\DiscountFactory;
 use AcmeWidgetCo\Domain\Factories\ProductFactory;
 use AcmeWidgetCo\Domain\Factories\TotalFactory;
 use AcmeWidgetCo\Domain\Interfaces\BasketInterface;
@@ -18,6 +20,8 @@ use AcmeWidgetCo\Domain\Interfaces\DeliveryConditionFactoryInterface;
 use AcmeWidgetCo\Domain\Interfaces\DeliveryConditionInterface;
 use AcmeWidgetCo\Domain\Interfaces\DeliveryConditionPriorityCalculatorInterface;
 use AcmeWidgetCo\Domain\Interfaces\DeliveryConditionRepositoryInterface;
+use AcmeWidgetCo\Domain\Interfaces\DiscountFactoryInterface;
+use AcmeWidgetCo\Domain\Interfaces\DiscountInterface;
 use AcmeWidgetCo\Domain\Interfaces\FormatterInterface;
 use AcmeWidgetCo\Domain\Interfaces\OfferManagerInterface;
 use AcmeWidgetCo\Domain\Interfaces\OfferRepositoryInterface;
@@ -32,7 +36,6 @@ use AcmeWidgetCo\Domain\Services\DeliveryConditionPriorityCalculator;
 use AcmeWidgetCo\Domain\Services\OfferManager;
 use AcmeWidgetCo\Domain\Services\TotalCollectorManager;
 use AcmeWidgetCo\Domain\TotalCollectors\DeliveryCollector;
-use AcmeWidgetCo\Domain\TotalCollectors\DiscountCollector;
 use AcmeWidgetCo\Domain\TotalCollectors\SubTotalCollector;
 use AcmeWidgetCo\Infrastructure\Config\Config;
 use AcmeWidgetCo\Infrastructure\DI\DIContainer;
@@ -61,6 +64,8 @@ return [
     BasketItemFactoryInterface::class => BasketItemFactory::class,
     TotalFactoryInterface::class => TotalFactory::class,
     TotalInterface::class => Total::class,
+    DiscountFactoryInterface::class => DiscountFactory::class,
+    DiscountInterface::class => Discount::class,
     DeliveryConditionPriorityCalculatorInterface::class => DeliveryConditionPriorityCalculator::class,
     ProductRepositoryInterface::class => InMemoryProductRepository::class,
     Config::class => function () {
@@ -106,17 +111,6 @@ return [
             },
             'totalType' => function (ContainerInterface $container) {
                 return $container->get(Config::class)->get(['total_types', 'delivery']);
-            }
-        ]
-    ],
-    DiscountCollector::class => [
-        'class' => DiscountCollector::class,
-        'arguments' => [
-            'currency' => function (ContainerInterface $container) {
-                return $container->get(Config::class)->get('currency');
-            },
-            'totalType' => function (ContainerInterface $container) {
-                return $container->get(Config::class)->get(['total_types', 'discount']);
             }
         ]
     ],
